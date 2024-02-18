@@ -6,12 +6,13 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import AuthenticationCode, UserProfile
+from .models import AuthenticationCode, UserProfile, Pet
 from .serializers import (
     AuthenticationCodeSendSerializer,
     AuthenticationCodeVerifySerializer,
     UserDetailSerializer,
     UserUpdateSerializer,
+    PetDetailSerializer
 )
 
 
@@ -70,13 +71,25 @@ class VerifyCodeView(generics.CreateAPIView):
             return Response({'error': 'Неверный код подтверждения'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserProfileView(generics.RetrieveAPIView):
+class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserDetailSerializer
     queryset = UserProfile.objects.all()
 
 
-class UserListProfileView(generics.ListAPIView):
+class UserProfileListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserDetailSerializer
     queryset = UserProfile.objects.all()
+
+
+class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PetDetailSerializer
+    queryset = Pet.objects.all()
+
+
+class PetListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PetDetailSerializer
+    queryset = Pet.objects.all()

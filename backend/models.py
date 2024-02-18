@@ -3,12 +3,13 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 
 
-# class UserProfileManager(BaseUserManager):
-#     def create_user(self, phone_number, password=None, **extra_fields):
-#         pass
-#
-#     def create_superuser(self, phone_number, password=None, **extra_fields):
-#         pass
+class UserProfileManager(BaseUserManager):
+    def create_user(self, phone_number, password=None, **extra_fields):
+        pass
+
+    def create_superuser(self, phone_number, password=None, **extra_fields):
+        pass
+
 
 class Pet(models.Model):
     name = models.CharField(max_length=255, blank=False)
@@ -26,7 +27,7 @@ class UserProfile(AbstractBaseUser):
     phone_number = models.CharField(max_length=15, unique=True, null=False, blank=False)
     pets = models.ManyToManyField(Pet, blank=True)
 
-    # objects = UserProfileManager()
+    objects = UserProfileManager()
 
     USERNAME_FIELD = 'phone_number'
 
