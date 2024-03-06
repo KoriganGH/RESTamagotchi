@@ -2,21 +2,14 @@ import re
 import random
 import string
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import AuthenticationCode, UserProfile, Pet
-from .serializers import (
-    AuthenticationCodeSendSerializer,
-    AuthenticationCodeVerifySerializer,
-    UserDetailSerializer,
-    UserUpdateSerializer,
-    PetDetailSerializer
-)
+from .serializers import *
 
 
-# логику перенести
 class SendVerificationCodeView(generics.CreateAPIView):
     serializer_class = AuthenticationCodeSendSerializer
 
@@ -45,7 +38,6 @@ class SendVerificationCodeView(generics.CreateAPIView):
         return Response({'message': f'Код подтверждения {auth_code.code} отправлен на номер {phone_number}'})
 
 
-# логику перенести
 class VerifyCodeView(generics.CreateAPIView):
     serializer_class = AuthenticationCodeVerifySerializer
 
@@ -71,25 +63,74 @@ class VerifyCodeView(generics.CreateAPIView):
             return Response({'error': 'Неверный код подтверждения'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserDetailSerializer
-    queryset = UserProfile.objects.all()
+# class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     serializer_class = UserDetailSerializer
+#     queryset = UserProfile.objects.all()
+#
+#
+# class UserProfileListCreateView(generics.ListCreateAPIView):
+#     # permission_classes = [IsAuthenticated]
+#     serializer_class = UserDetailSerializer
+#     queryset = UserProfile.objects.all()
+
+class BaseViewSet(viewsets.ModelViewSet):
+    # permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.model.objects.all()
 
 
-class UserProfileListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserDetailSerializer
-    queryset = UserProfile.objects.all()
+class CategoryViewSet(BaseViewSet):
+    model = Category
+    serializer_class = CategoryDetailSerializer
 
 
-class PetDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+class FoodViewSet(BaseViewSet):
+    model = Food
+    serializer_class = FoodDetailSerializer
+
+
+class CategoryFoodViewSet(BaseViewSet):
+    model = CategoryFood
+    serializer_class = CategoryFoodDetailSerializer
+
+
+class PersonalityViewSet(BaseViewSet):
+    model = Personality
+    serializer_class = PersonalityDetailSerializer
+
+
+class SkinViewSet(BaseViewSet):
+    model = Skin
+    serializer_class = SkinDetailSerializer
+
+
+class PetViewSet(BaseViewSet):
+    model = Pet
     serializer_class = PetDetailSerializer
-    queryset = Pet.objects.all()
 
 
-class PetListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = PetDetailSerializer
-    queryset = Pet.objects.all()
+class GameViewSet(BaseViewSet):
+    model = Game
+    serializer_class = GameDetailSerializer
+
+
+class UserStorageFoodViewSet(BaseViewSet):
+    model = UserStorageFood
+    serializer_class = UserStorageFoodDetailSerializer
+
+
+class UserStorageSkinViewSet(BaseViewSet):
+    model = UserStorageSkin
+    serializer_class = UserStorageSkinDetailSerializer
+
+
+class UserProfileViewSet(BaseViewSet):
+    model = UserProfile
+    serializer_class = UserDetailSerializer
+
+
+class AdminViewSet(BaseViewSet):
+    model = Admin
+    serializer_class = AdminDetailSerializer

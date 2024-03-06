@@ -1,40 +1,120 @@
+from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
-from django.db import models
 
 
-class UserProfileManager(BaseUserManager):
-    def create_user(self, phone_number, password=None, **extra_fields):
-        pass
+class Category(models.Model):
+    category_name = models.CharField(max_length=255)
 
-    def create_superuser(self, phone_number, password=None, **extra_fields):
-        pass
+    class Meta:
+        db_table = 'categories'
+
+
+class Food(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.IntegerField()
+    saturation = models.IntegerField()
+
+    class Meta:
+        db_table = 'food'
+
+
+class CategoryFood(models.Model):
+    category = models.OneToOneField(Category, models.CASCADE, primary_key=True)
+    food = models.ForeignKey(Food, models.CASCADE)
+
+    class Meta:
+        db_table = 'categories_food'
+        unique_together = (('category', 'food'),)
+
+
+class Personality(models.Model):
+    personality = models.CharField(max_length=255)
+    category = models.ForeignKey(Category, models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = 'personality'
+
+
+class Skin(models.Model):
+    type = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    price = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'skin'
 
 
 class Pet(models.Model):
-    name = models.CharField(max_length=255, blank=False)
-    health = models.IntegerField(default=100)
-    happiness = models.IntegerField(default=100)
-    hunger = models.IntegerField(default=0)
-    level = models.PositiveIntegerField(default=0)
-    owner = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    age = models.IntegerField()
+    is_male = models.BooleanField()
+    personality = models.ForeignKey(Personality, models.SET_NULL, blank=True, null=True)
 
-    def __str__(self):
-        return self.name
+    class Meta:
+        db_table = 'pet'
+
+
+class Game(models.Model):
+    points = models.IntegerField()
+    user = models.ForeignKey('UserProfile', models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = 'game'
+
+
+class UserStorageFood(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    day_id = models.DateField(blank=True, null=True)
+    user = models.ForeignKey('UserProfile', models.CASCADE, blank=True, null=True)
+    food = models.ForeignKey(Food, models.CASCADE, blank=True, null=True)
+    pet = models.ForeignKey(Pet, models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = 'user_storage_food'
+
+
+class UserStorageSkin(models.Model):
+    transaction_id = models.AutoField(primary_key=True)
+    day_id = models.DateField()
+    user = models.ForeignKey('UserProfile', models.CASCADE)
+    skin = models.ForeignKey(Skin, models.CASCADE)
+    pet = models.ForeignKey(Pet, models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        db_table = 'user_storage_skin'
+
+
+# class UserProfileManager(BaseUserManager):
+#     def create_user(self, phone_number, password=None, **extra_fields):
+#         pass
+#
+#     def create_superuser(self, phone_number, password=None, **extra_fields):
+#         pass
 
 
 class UserProfile(AbstractBaseUser):
+    name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=15, unique=True, null=False, blank=False)
-    pets = models.ManyToManyField(Pet, blank=True)
+    pet = models.ForeignKey(Pet, models.SET_NULL, blank=True, null=True)
+    created_at = models.DateField(blank=True, null=True)
+    balance = models.IntegerField(blank=True, null=True)
 
-    objects = UserProfileManager()
+    # objects = UserProfileManager()
 
     USERNAME_FIELD = 'phone_number'
 
     # REQUIRED_FIELDS = []
 
-    def __str__(self):
-        return f"Пользователь {self.phone_number}"
+    class Meta:
+        db_table = 'user_table'
+
+
+class Admin(models.Model):
+    user = models.ForeignKey('UserProfile', models.SET_NULL, blank=True, null=True)
+
+    class Meta:
+        db_table = 'admin'
 
 
 class AuthenticationCode(models.Model):
