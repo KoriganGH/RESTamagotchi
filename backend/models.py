@@ -1,6 +1,7 @@
 from django.db import models
 # from django.contrib.auth.base_user import BaseUserManager
 # from django.contrib.auth.models import AbstractBaseUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -51,9 +52,12 @@ class Pet(models.Model):
     is_male = models.BooleanField(blank=True, null=True)
     user = models.ForeignKey('UserProfile', models.CASCADE, blank=False, null=False)
     personality = models.ForeignKey(Personality, models.SET_NULL, blank=True, null=True)
-    mood_points = models.IntegerField(default=100, blank=True, null=True)
-    purity_points = models.IntegerField(default=100, blank=True, null=True)
-    starvation_points = models.IntegerField(default=100, blank=True, null=True)
+    mood_points = models.IntegerField(default=100, blank=True, null=True, validators=[
+        MaxValueValidator(100), MinValueValidator(0)])
+    purity_points = models.IntegerField(default=100, blank=True, null=True, validators=[
+        MaxValueValidator(100), MinValueValidator(0)])
+    starvation_points = models.IntegerField(default=100, blank=True, null=True, validators=[
+        MaxValueValidator(100), MinValueValidator(0)])
 
 
     class Meta:

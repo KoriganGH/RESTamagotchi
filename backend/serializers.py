@@ -44,6 +44,12 @@ class PetPointsSerializer(serializers.ModelSerializer):
         fields = ['mood_points', 'purity_points', 'starvation_points']
 
 
+class PetPointsIncreaseSerializer(serializers.Serializer):
+    pet_id = serializers.IntegerField()
+    characteristic = serializers.CharField()
+    value = serializers.IntegerField()
+
+
 class GameDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
@@ -54,6 +60,12 @@ class UserStorageFoodDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserStorageFood
         fields = "__all__"
+
+
+class BuyFoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserStorageFood
+        fields = "user", "food"
 
 
 class UserStorageSkinDetailSerializer(serializers.ModelSerializer):

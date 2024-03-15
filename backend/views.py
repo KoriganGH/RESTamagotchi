@@ -93,6 +93,30 @@ class FoodViewSet(BaseViewSet):
     serializer_class = FoodDetailSerializer
 
 
+class PurchaseFoodView(generics.CreateAPIView):
+    serializer_class = BuyFoodSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        food_id = request.data.get('food_id')
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+            food = Food.objects.get(pk=food_id)
+            if user.balance >= food.price:
+                user_food, created = UserStorageFood.objects.get_or_create(user=user, food=food)
+                if not created:
+                    user_food.count += 1
+                    user_food.save()
+                return Response("Еда успешно куплена", status=status.HTTP_200_OK)
+            else:
+                return Response("Нехватка средств для покупки", status=status.HTTP_400_BAD_REQUEST)
+
+        except UserProfile.DoesNotExist:
+            return Response("Пользователь не найден", status=status.HTTP_404_NOT_FOUND)
+        except Food.DoesNotExist:
+            return Response("Скин не найден", status=status.HTTP_404_NOT_FOUND)
+
+
 class CategoryFoodViewSet(BaseViewSet):
     model = CategoryFood
     serializer_class = CategoryFoodDetailSerializer
@@ -108,6 +132,28 @@ class SkinViewSet(BaseViewSet):
     serializer_class = SkinDetailSerializer
 
 
+class PurchaseSkinView(generics.CreateAPIView):
+    serializer_class = UserStorageSkinDetailSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        skin_id = request.data.get('skin_id')
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+            skin = Skin.objects.get(pk=skin_id)
+            if user.balance >= skin.price:
+                user.balance -= skin.price
+                user.save()
+                UserStorageSkin.objects.create(user=user, skin=skin)
+                return Response("Скин успешно куплен", status=status.HTTP_200_OK)
+            else:
+                return Response("Нехватка средств для покупки", status=status.HTTP_400_BAD_REQUEST)
+        except UserProfile.DoesNotExist:
+            return Response("Пользователь не найден", status=status.HTTP_404_NOT_FOUND)
+        except Skin.DoesNotExist:
+            return Response("Скин не найден", status=status.HTTP_404_NOT_FOUND)
+
+
 class PetViewSet(BaseViewSet):
     model = Pet
     serializer_class = PetDetailSerializer
@@ -117,6 +163,28 @@ class PetPointsAPIView(generics.RetrieveAPIView):
     queryset = Pet.objects.all()
     serializer_class = PetPointsSerializer
     lookup_url_kwarg = 'pk'
+
+
+class IncreasePetPointsView(generics.CreateAPIView):
+    serializer_class = PetPointsIncreaseSerializer
+
+    def perform_create(self, serializer):
+        pet_id = serializer.validated_data['pet_id']
+        characteristic = serializer.validated_data['characteristic']
+        value = serializer.validated_data['value']
+        try:
+            pet = Pet.objects.get(pk=pet_id)
+            if characteristic == 'mood':
+                pet.mood_points += value
+            elif characteristic == 'purity':
+                pet.purity_points += value
+            elif characteristic == 'starvation':
+                pet.starvation_points += value
+            else:
+                raise serializers.ValidationError("Неверная характеристика")
+            pet.save()
+        except Pet.DoesNotExist:
+            raise serializers.ValidationError("Питомец не найден")
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
