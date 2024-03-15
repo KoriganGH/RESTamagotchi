@@ -30,6 +30,7 @@ router.register(r'admins', AdminViewSet, basename='admin')
 urlpatterns = [
     path('auth_code/send/', SendVerificationCodeView.as_view(), name='send_code'),
     path('auth_code/verify/', VerifyCodeView.as_view(), name='verify'),
+    path('pets/<int:pk>/points/', PetPointsAPIView.as_view(), name='pet_points'),
     path('', include(router.urls)),
     path('swagger<str:format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

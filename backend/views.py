@@ -113,6 +113,17 @@ class PetViewSet(BaseViewSet):
     serializer_class = PetDetailSerializer
 
 
+class PetPointsAPIView(generics.RetrieveAPIView):
+    queryset = Pet.objects.all()
+    serializer_class = PetPointsSerializer
+    lookup_url_kwarg = 'pk'
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
 class GameViewSet(BaseViewSet):
     model = Game
     serializer_class = GameDetailSerializer

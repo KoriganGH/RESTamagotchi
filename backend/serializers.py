@@ -38,6 +38,12 @@ class PetDetailSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PetPointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pet
+        fields = ['mood_points', 'purity_points', 'starvation_points']
+
+
 class GameDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
