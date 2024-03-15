@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractBaseUser
+# from django.contrib.auth.base_user import BaseUserManager
+# from django.contrib.auth.models import AbstractBaseUser
 
 
 class Category(models.Model):
@@ -29,7 +29,7 @@ class CategoryFood(models.Model):
 
 
 class Personality(models.Model):
-    personality = models.CharField(max_length=255)
+    personality = models.CharField(max_length=255, blank=False, null=False)
     category = models.ForeignKey(Category, models.CASCADE, blank=True, null=True)
 
     class Meta:
@@ -46,10 +46,15 @@ class Skin(models.Model):
 
 
 class Pet(models.Model):
-    name = models.CharField(max_length=255)
-    age = models.IntegerField()
-    is_male = models.BooleanField()
+    name = models.CharField(max_length=255, blank=False, null=False)
+    age = models.IntegerField(blank=True, null=True)
+    is_male = models.BooleanField(blank=True, null=True)
+    user = models.ForeignKey('UserProfile', models.CASCADE, blank=False, null=False)
     personality = models.ForeignKey(Personality, models.SET_NULL, blank=True, null=True)
+    mood_points = models.IntegerField(default=100, blank=True, null=True)
+    purity_points = models.IntegerField(default=100, blank=True, null=True)
+    starvation_points = models.IntegerField(default=100, blank=True, null=True)
+
 
     class Meta:
         db_table = 'pet'
@@ -64,22 +69,17 @@ class Game(models.Model):
 
 
 class UserStorageFood(models.Model):
-    transaction_id = models.AutoField(primary_key=True)
-    day_id = models.DateField(blank=True, null=True)
     user = models.ForeignKey('UserProfile', models.CASCADE, blank=True, null=True)
     food = models.ForeignKey(Food, models.CASCADE, blank=True, null=True)
-    pet = models.ForeignKey(Pet, models.CASCADE, blank=True, null=True)
+    count = models.IntegerField(blank=True, null=True, default=1)
 
     class Meta:
         db_table = 'user_storage_food'
 
 
 class UserStorageSkin(models.Model):
-    transaction_id = models.AutoField(primary_key=True)
-    day_id = models.DateField()
     user = models.ForeignKey('UserProfile', models.CASCADE)
     skin = models.ForeignKey(Skin, models.CASCADE)
-    pet = models.ForeignKey(Pet, models.CASCADE, blank=True, null=True)
 
     class Meta:
         db_table = 'user_storage_skin'
@@ -91,27 +91,38 @@ class UserStorageSkin(models.Model):
 #
 #     def create_superuser(self, phone_number, password=None, **extra_fields):
 #         pass
+#
+#
+# class UserProfile(AbstractBaseUser):
+#     name = models.CharField(max_length=200)
+#     phone_number = models.CharField(max_length=15, unique=True, null=False, blank=False)
+#     created_at = models.DateField(blank=True, null=True)
+#     balance = models.IntegerField(blank=True, null=True)
+#
+#     objects = UserProfileManager()
+#
+#     USERNAME_FIELD = 'phone_number'
+#
+#     REQUIRED_FIELDS = []
+#
+#     class Meta:
+#         db_table = 'user_table'
 
 
-class UserProfile(AbstractBaseUser):
+class UserProfile(models.Model):
     name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=15, unique=True, null=False, blank=False)
-    pet = models.ForeignKey(Pet, models.SET_NULL, blank=True, null=True)
     created_at = models.DateField(blank=True, null=True)
     balance = models.IntegerField(blank=True, null=True)
-
-    # objects = UserProfileManager()
-
-    USERNAME_FIELD = 'phone_number'
-
-    # REQUIRED_FIELDS = []
 
     class Meta:
         db_table = 'user_table'
 
 
 class Admin(models.Model):
-    user = models.ForeignKey('UserProfile', models.SET_NULL, blank=True, null=True)
+    # user = models.ForeignKey('UserProfile', models.SET_NULL, blank=True, null=True)
+    login = models.CharField(max_length=200, unique=True, null=False, blank=False)
+    password = models.CharField(max_length=200, null=False, blank=False)
 
     class Meta:
         db_table = 'admin'

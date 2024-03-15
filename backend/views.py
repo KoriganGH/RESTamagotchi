@@ -33,7 +33,7 @@ class SendVerificationCodeView(generics.CreateAPIView):
         auth_code.expiration_time = timezone.now() + timezone.timedelta(minutes=5)
         auth_code.save()
 
-        request.session['phone_number'] = phone_number
+        # request.session['phone_number'] = phone_number
 
         return Response({'message': f'Код подтверждения {auth_code.code} отправлен на номер {phone_number}'})
 
@@ -42,7 +42,8 @@ class VerifyCodeView(generics.CreateAPIView):
     serializer_class = AuthenticationCodeVerifySerializer
 
     def create(self, request, *args, **kwargs):
-        phone_number = request.session.get('phone_number')
+        # phone_number = request.session.get('phone_number')
+        phone_number = request.data.get('phone_number')
         entered_code = request.data.get('code')
         auth_code = AuthenticationCode.objects.get(phone_number=phone_number)
 
@@ -54,11 +55,12 @@ class VerifyCodeView(generics.CreateAPIView):
                 user.invite_code = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
                 user.save()
 
-            refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
+            # refresh = RefreshToken.for_user(user)
+            # access_token = str(refresh.access_token)
 
-            return Response({'refresh_token': str(refresh),
-                             'access_token': str(access_token)})
+            # return Response({'refresh_token': str(refresh), 'access_token': str(access_token)})
+
+            return Response({"message": "Успешная авторизация"}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Неверный код подтверждения'}, status=status.HTTP_400_BAD_REQUEST)
 

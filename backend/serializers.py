@@ -52,7 +52,7 @@ class UserStorageFoodDetailSerializer(serializers.ModelSerializer):
 
 class UserStorageSkinDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserStorageFood
+        model = UserStorageSkin
         fields = "__all__"
 
 
@@ -83,4 +83,4 @@ class AuthenticationCodeSendSerializer(serializers.ModelSerializer):
 class AuthenticationCodeVerifySerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthenticationCode
-        fields = ('code',)
+        fields = ('phone_number', 'code')
