@@ -114,10 +114,10 @@ class UserStorageSkin(models.Model):
 
 
 class UserProfile(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, default="user")
     phone_number = models.CharField(max_length=15, unique=True, null=False, blank=False)
-    created_at = models.DateField(blank=True, null=True)
-    balance = models.IntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    balance = models.IntegerField(blank=True, null=True, default=1000)
 
     class Meta:
         db_table = 'user_table'

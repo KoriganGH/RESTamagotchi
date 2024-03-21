@@ -80,6 +80,22 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserEditBalanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = "id", "balance"
+
+    id = serializers.IntegerField(required=True)
+
+
+class UserSetNickSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = "id", "name"
+
+    id = serializers.IntegerField(required=True)
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile

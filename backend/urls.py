@@ -32,6 +32,8 @@ urlpatterns = [
     path('auth_code/verify/', VerifyCodeView.as_view(), name='verify'),
     path('pets/<int:pk>/points/', PetPointsAPIView.as_view(), name='pet_points'),
     path('pets/increase/', IncreasePetPointsView.as_view(), name='increase_pet_points'),
+    path('user_profiles/edit_balance/', UserProfileEditBalanceView.as_view(), name='edit_user_balance'),
+    path('user_profiles/set_name/', UserProfileSetNickView.as_view(), name='user_set_name'),
     path('buy/skin/', PurchaseSkinView.as_view(), name='buy_skin'),
     path('buy/food/', PurchaseFoodView.as_view(), name='buy_food'),
     path('', include(router.urls)),

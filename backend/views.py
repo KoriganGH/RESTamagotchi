@@ -212,6 +212,36 @@ class UserProfileViewSet(BaseViewSet):
     serializer_class = UserDetailSerializer
 
 
+class UserProfileSetNickView(generics.CreateAPIView):
+    serializer_class = UserSetNickSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('id')
+        name = request.data.get('name')
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+            user.name = name
+            user.save()
+            return Response("Имя пользователя изменено", status=status.HTTP_200_OK)
+        except UserProfile.DoesNotExist:
+            return Response("Пользователь не найден", status=status.HTTP_404_NOT_FOUND)
+
+
+class UserProfileEditBalanceView(generics.CreateAPIView):
+    serializer_class = UserEditBalanceSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('id')
+        balance = request.data.get('balance')
+        try:
+            user = UserProfile.objects.get(pk=user_id)
+            user.balance += balance
+            user.save()
+            return Response("Баланс пользователя изменен", status=status.HTTP_200_OK)
+        except UserProfile.DoesNotExist:
+            return Response("Пользователь не найден", status=status.HTTP_404_NOT_FOUND)
+
+
 class AdminViewSet(BaseViewSet):
     model = Admin
     serializer_class = AdminDetailSerializer
