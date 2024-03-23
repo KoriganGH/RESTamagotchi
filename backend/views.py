@@ -45,7 +45,10 @@ class VerifyCodeView(generics.CreateAPIView):
         # phone_number = request.session.get('phone_number')
         phone_number = request.data.get('phone_number')
         entered_code = request.data.get('code')
-        auth_code = AuthenticationCode.objects.get(phone_number=phone_number)
+        try:
+            auth_code = AuthenticationCode.objects.get(phone_number=phone_number)
+        except AuthenticationCode.DoesNotExist:
+            return Response({'error': 'Для этого номера нет кода'}, status=status.HTTP_400_BAD_REQUEST)
 
         if entered_code == auth_code.code and auth_code.expiration_time > timezone.now():
             user, created = UserProfile.objects.get_or_create(phone_number=phone_number)
@@ -55,11 +58,12 @@ class VerifyCodeView(generics.CreateAPIView):
                 user.invite_code = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
                 user.save()
 
+                return Response({"message": "Вы успешно создали аккаунт"}, status=status.HTTP_200_OK)
+
             # refresh = RefreshToken.for_user(user)
             # access_token = str(refresh.access_token)
 
             # return Response({'refresh_token': str(refresh), 'access_token': str(access_token)})
-
             return Response({"message": "Успешная авторизация"}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Неверный код подтверждения'}, status=status.HTTP_400_BAD_REQUEST)
@@ -114,7 +118,7 @@ class PurchaseFoodView(generics.CreateAPIView):
         except UserProfile.DoesNotExist:
             return Response("Пользователь не найден", status=status.HTTP_404_NOT_FOUND)
         except Food.DoesNotExist:
-            return Response("Скин не найден", status=status.HTTP_404_NOT_FOUND)
+            return Response("Еда не найдена", status=status.HTTP_404_NOT_FOUND)
 
 
 class CategoryFoodViewSet(BaseViewSet):
